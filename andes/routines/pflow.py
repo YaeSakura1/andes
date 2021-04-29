@@ -20,7 +20,7 @@ class PFlow(BaseRoutine):
     def __init__(self, system=None, config=None):
         super().__init__(system, config)
         self.config.add(OrderedDict((('tol', 1e-6),
-                                     ('max_iter', 25),
+                                     ('max_iter', 35),
                                      ('method', 'NR'),
                                      ('check_conn', 1),
                                      ('n_factorize', 4),
