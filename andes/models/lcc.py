@@ -24,6 +24,11 @@ class LCC(ACDC2Term):
         self.k1 = NumParam(default=0.0, info="Loss coefficient - linear")
         self.k2 = NumParam(default=0.0, info="Loss coefficient - quadratic")
 
+        self.droop = NumParam(default=0.0, info="Enable dc voltage droop control", unit="boolean")
+        self.K = NumParam(default=0.0, info="Droop coefficient")
+        self.vhigh = NumParam(default=9999, info="Upper voltage threshold in droop control", unit="pu")
+        self.vlow = NumParam(default=0.0, info="Lower voltage threshold in droop control", unit="pu")
+
         self.vshmax = NumParam(default=1.1, info="Maximum ac interface voltage", unit="pu")
         self.vshmin = NumParam(default=0.9, info="Minimum ac interface voltage", unit="pu")
         self.Ishmax = NumParam(default=2, info="Maximum ac current", unit="pu")
