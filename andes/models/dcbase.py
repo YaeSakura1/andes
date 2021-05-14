@@ -234,7 +234,7 @@ class ACDC3Term(ModelData, Model):
                               non_zero=True,
                               tex_name='V_{dcn2}',
                               )
-        elf.Vdcn3 = NumParam(default=100,
+        self.Vdcn3 = NumParam(default=100,
                              info='DC voltage rating on node 3',
                              unit='kV',
                              non_zero=True,
