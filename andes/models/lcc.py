@@ -33,8 +33,8 @@ class LCC(ACDC2Term):
         self.vshmin = NumParam(default=0.9, info="Minimum ac interface voltage", unit="pu")
         self.Ishmax = NumParam(default=2, info="Maximum ac current", unit="pu")
 
-        self.MR = NumParam(default=1, info="Rectifier-side transformer tap ratio", unit="pu/pu")
-        self.MI = NumParam(default=1, info="Inverter-side transformer tap ratio", unit="pu/pu")
+        self.MR = State(default=1, info="Rectifier-side transformer tap ratio", unit="pu/pu")
+        self.MI = State(default=1, info="Inverter-side transformer tap ratio", unit="pu/pu")
 
 
 
