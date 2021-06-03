@@ -16,7 +16,7 @@ class VSCShunt(ACDC2Term):
         self.xsh = NumParam(default=0.06, info="AC interface reactance", unit="ohm", z=True,
                             tex_name='x_{sh}')
 
-        self.control = NumParam(info="Control method: 0-PQ, 1-PV, 2-vQ or 3-vV")
+        self.control = NumParam(info="Control method: 0-PQ, 1-PV, 2-vQ or 3-vV", mandatory=True)
         self.v0 = NumParam(default=1.0, info="AC voltage setting (PV or vV) or initial guess (PQ or vQ)")
         self.p0 = NumParam(default=0.0, info="AC active power setting", unit="pu")
         self.q0 = NumParam(default=0.0, info="AC reactive power setting", unit="pu")
