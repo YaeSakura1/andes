@@ -225,7 +225,7 @@ class System:
         self._adders = dict(f=list(), g=list(), x=list(), y=list())
         self._setters = dict(f=list(), g=list(), x=list(), y=list())
 
-    def prepare(self, quick=False, incremental=True):
+    def prepare(self, quick=False, incremental=False):
         """
         Generate numerical functions from symbolically defined models.
 
