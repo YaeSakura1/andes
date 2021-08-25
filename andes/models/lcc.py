@@ -24,6 +24,8 @@ class LCC(ACDC2Term):
         self.k1 = NumParam(default=0.0, info="Loss coefficient - linear")
         self.k2 = NumParam(default=0.0, info="Loss coefficient - quadratic")
 
+        self.ky = NumParam(default=0.9995, info="commutation effect is taken into consideration")
+
         self.droop = NumParam(default=0.0, info="Enable dc voltage droop control", unit="boolean")
         self.K = NumParam(default=0.0, info="Droop coefficient")
         self.vhigh = NumParam(default=9999, info="Upper voltage threshold in droop control", unit="pu")
@@ -33,8 +35,8 @@ class LCC(ACDC2Term):
         self.vshmin = NumParam(default=0.9, info="Minimum ac interface voltage", unit="pu")
         self.Ishmax = NumParam(default=2, info="Maximum ac current", unit="pu")
 
-        self.MR = State(default=1, info="Rectifier-side transformer tap ratio", unit="pu/pu")
-        self.MI = State(default=1, info="Inverter-side transformer tap ratio", unit="pu/pu")
+        self.MR = NumParam(default=1, info="Rectifier-side transformer tap ratio", unit="pu/pu")
+        self.MI = NumParam(default=1, info="Inverter-side transformer tap ratio", unit="pu/pu")
 
 
 
@@ -57,57 +59,57 @@ class LCC(ACDC2Term):
                         e_str='',
                         diag_eps=True,
                         )
-        self.α = Algeb(info="Rectifier firing angle",
+        self.a = Algeb(info="Rectifier firing angle",
                        unit='rad',
                        tex_name='theta_{h}',
                        v_str='',
                        e_str='',
                        diag_eps=True,
                        )
-        self.γ = Algeb(info='Inverter extinction angle',
+        self.y = Algeb(info='Inverter extinction angle',
                        unit='rad',
                        tex_name='theta_{h}',
                        v_str='',
                        e_str='',
                        diag_eps=True,
                        )
-        self.θh = Algeb(info="angle between the average ac voltage and the ac current of the retifier",
+        self.ah = Algeb(info="angle between the average ac voltage and the ac current of the retifier",
                         unit='rad',
                         tex_name='theta_{sh}',
                         v_str='',
                         e_str='',
                         diag_eps=True,
                         )
-        self.θk = Algeb(info="angle between the average ac voltage and the ac current of the inverter",
+        self.ak = Algeb(info="angle between the average ac voltage and the ac current of the inverter",
                         unit='rad',
                         tex_name='theta_{sh}',
                         v_str='',
                         e_str='',
                         diag_eps=True,
                         )
-        self.ph = Algeb(info='active power injection into LCC',
+        self.ph = Algeb(info='active power injections at the ac-side',
                         tex_name="P_{h}",
                         unit='p.u.',
                         v_str='ph',
                         e_str='u * (-vrdc * irdc)',
                         diag_eps=True,
                         )
-        self.qh = Algeb(info='reactive power injection into LCC',
+        self.qh = Algeb(info='reactive power injections at the ac-side',
                         unit="p.u.",
                         tex_name="Q_{h}",
                         v_str='qh',
-                        e_str='u * (-0.9995 * 3**0.5/3.1415) * MR * vh * irdc * sin(θh)',
+                        e_str='u * (-ky * 3**0.5/3.1415) * MR * vh * irdc * sin(θh)',
                         diag_eps=True,
                         )
         self.pk = Algeb(info='the interver injects active power',
                         unit='p.u.',
                         v_str='pk',
-                        e_str='u * ( - vidc * iidc)',
+                        e_str='u * (-vidc * iidc)',
                         diag_eps=True,
                         )
         self.qk = Algeb(info='consumes reactive power at the ac bus',
                         unit='p.u.',
                         v_str='qk',
-                        e_str='u * ( -0.9995 * 3**0.5/3.1415) * MI * vk * iidc * sin(θk)',
+                        e_str='u * (ky * 3**0.5/3.1415) * MI * vk * iidc * sin(θk)',
                         diag_eps=True,
                         )
