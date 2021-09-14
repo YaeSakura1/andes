@@ -45,7 +45,7 @@ class LCC(ACDC2Term):
 
         self.XRc = NumParam(default=0.03, info="Commutation reactance", unit="pu")
         self.kr = NumParam(default=0.995, info="consider the commutation effect")
-        self.n = NumParam(default=6, info="the converter bridge number")
+        self.N = NumParam(default=6, info="the converter bridge number")
         self.d = NumParam(default=0.436, info="the converter power factor angle", unit="rad")
 
         self.ids = NumParam(default=2, info="the current set value", unit="pu")
@@ -85,13 +85,13 @@ class LCC(ACDC2Term):
         self.vdr = Algeb(info='the rectifier dc power equations at ac side',
                          unit='p.u.',
                          v_str='vdr',
-                         e_str='3 * 2**0.5/pi * n * KR * v * cos(ar) - 3/pi * n * XRc * Id - vdr',
+                         e_str='3 * 2**0.5/pi * N * KR * v * cos(ar) - 3/pi * N * XRc * Id - vdr',
                          diag_eps=True,
                          )
         self.vdr = Algeb(info='the relationship between DC voltage and AC voltage',
                          unit='p.u.',
                          v_str='vdr',
-                         e_str='kr * 3 * 2**0.5/pi * n * KR * v * cos(d) - vdr',
+                         e_str='kr * 3 * 2**0.5/pi * N * KR * v * cos(d) - vdr',
                          diag_eps=True,
                          )
         self.Pdr = Algeb(info='the rectifier active power',
@@ -111,13 +111,13 @@ class LCC(ACDC2Term):
         self.vdi = Algeb(info='the inverter dc power equations at ac side',
                          unit='p.u.',
                          v_str='vdi',
-                         e_str='3 * 2**0.5/pi * n * KI * v * cos(bi) - 3/pi * n * XRc * Id - vdi',
+                         e_str='3 * 2**0.5/pi * N * KI * v * cos(bi) - 3/pi * N * XRc * Id - vdi',
                          diag_eps=True,
                          )
         self.vdi = Algeb(info='the relationship between DC voltage and AC voltage',
                          unit='p.u.',
                          v_str='vdi',
-                         e_str='kr * 3 * 2**0.5/pi * n * KI * v * cos(d) - vdi',
+                         e_str='kr * 3 * 2**0.5/pi * N * KI * v * cos(d) - vdi',
                          diag_eps=True,
                          )
         self.Pdi = Algeb(info='the inverter active power',
@@ -137,7 +137,7 @@ class LCC(ACDC2Term):
         self.ic = Algeb(info='the fundamental current injected into the converter',
                         unit='p.u.',
                         v_str='ic',
-                        e_str='6 * 2**0.5/pi * kr * n * Id',
+                        e_str='6 * 2**0.5/pi * kr * N * Id',
                         diag_eps=True,
                         )
         self.ploss = Algeb(info='the lcc converter loss',
