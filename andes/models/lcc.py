@@ -6,8 +6,6 @@ from andes.core.var import Algeb, State, ExtState, ExtAlgeb  # NOQA
 from andes.core.service import ConstService, ExtService  # NOQA
 from andes.core.discrete import HardLimiter, Switcher, AntiWindup  # NOQA
 from andes.core.block import PIController  #NOQA
-import math
-pi=math.pi
 
 class LCC(ACDC2Term):
     """Data for LCC in power flow"""
@@ -43,7 +41,7 @@ class LCC(ACDC2Term):
         self.bmax = NumParam(default=60, info="Maximum extinction angle", unit="rad")
         self.bmin = NumParam(default=15, info="Minimum extinction angle", unit="rad")
 
-        self.XRc = NumParam(default=0.03, info="Commutation reactance", unit="pu")
+        self.Xc = NumParam(default=0.03, info="Commutation reactance", unit="pu")
         self.kr = NumParam(default=0.995, info="consider the commutation effect")
         self.N = NumParam(default=6, info="the converter bridge number")
         self.d = NumParam(default=0.436, info="the converter power factor angle", unit="rad")
@@ -55,6 +53,9 @@ class LCC(ACDC2Term):
         self.bds = NumParam(default=22, info="the extinct angles set value", unit="rad")
         self.kds = NumParam(default=1, info="the ratios set value", unit="pu")
 
+        self.ar = NumParam(default=15, info="firing delay angle", unit="rad")
+        self.bi = NumParam(default=15, info="extinction advance angle", unit="rad")
+
         self.control = NumParam(info="Control method: 0-CC, 1-CV, 2-CP, 3-CIA, 4-CEA, or 5-CR", mandatory=True)
 
         # define variables and equations
@@ -64,141 +65,105 @@ class LCC(ACDC2Term):
 
         self.mode = Switcher(u=self.control, options=(0, 1, 2, 3, 4, 5))
 
-        self.ar = Algeb(info='Rectifier firing angle',
-                        unit='rad',
-                        tex_name='theta_{h}',
-                        v_str='ar',
-                        e_str='',
-                        diag_eps=True,
-                        )
-        self.bi = Algeb(info='Inverter extinction angle',
-                        unit='rad',
-                        tex_name='theta_{h}',
-                        v_str='bi',
-                        e_str='',
-                        diag_eps=True,
-                        )
 
-# 补充方程
-# (1)换流器方程:
-# 整流侧
-        self.vdr = Algeb(info='the rectifier dc power equations at ac side',
+# 整流器方程
+        self.vd0r = Algeb(info='ideal no-load direct voltage',
+                          unit='p.u.',
+                          tex_name='V_{d0r}',
+                          v_str='vd0r',
+                          e_str='3 * 2**0.5/pi * KR * N * v - vd0r',
+                          diag_eps=True,
+                          )
+        self.vdr = Algeb(info='rectifier dc voltage',
                          unit='p.u.',
+                         tex_name='V_{dr}',
                          v_str='vdr',
-                         e_str='3 * 2**0.5/pi * N * KR * v * cos(ar) - 3/pi * N * XRc * Id - vdr',
+                         e_str='3 * 2**0.5/pi * KR * N * v * cos(ar)- 3/pi * N * Xc * idr - vdr',
                          diag_eps=True,
                          )
-        self.vdr = Algeb(info='the relationship between DC voltage and AC voltage',
-                         unit='p.u.',
-                         v_str='vdr',
-                         e_str='kr * 3 * 2**0.5/pi * N * KR * v * cos(d) - vdr',
-                         diag_eps=True,
-                         )
-        self.Pdr = Algeb(info='the rectifier active power',
-                         unit='p.u.',
-                         v_str='pdr',
-                         e_str='vd * Id',
-                         diag_eps=True,
-                         )
-        self.Qdr = Algeb(info='the rectifier reactive power',
-                         unit='p.u.',
-                         v_str='qdr',
-                         e_str='vd * Id * (-1) * tan(d)',
-                         diag_eps=True,
-                         )
-
-# 逆变侧
-        self.vdi = Algeb(info='the inverter dc power equations at ac side',
-                         unit='p.u.',
-                         v_str='vdi',
-                         e_str='3 * 2**0.5/pi * N * KI * v * cos(bi) - 3/pi * N * XRc * Id - vdi',
-                         diag_eps=True,
-                         )
-        self.vdi = Algeb(info='the relationship between DC voltage and AC voltage',
-                         unit='p.u.',
-                         v_str='vdi',
-                         e_str='kr * 3 * 2**0.5/pi * N * KI * v * cos(d) - vdi',
-                         diag_eps=True,
-                         )
-        self.Pdi = Algeb(info='the inverter active power',
-                         unit='p.u.',
-                         v_str='pdi',
-                         e_str='vdi * Id',
-                         diag_eps=True,
-                         )
-        self.Qdi = Algeb(info='the inverter reactive power',
-                         unit='p.u.',
-                         v_str='qdi',
-                         e_str='vd * Id * (-1) * tan(d)',
-                         diag_eps=True,
-                         )
-
-# 换流器损耗
-        self.ic = Algeb(info='the fundamental current injected into the converter',
+        self.pr = Algeb(info='rectifier active power',
                         unit='p.u.',
-                        v_str='ic',
-                        e_str='6 * 2**0.5/pi * kr * N * Id',
+                        tex_name='P_{r}',
+                        v_str='pr',
+                        e_str='vdr * idr - pr',
                         diag_eps=True,
                         )
-        self.ploss = Algeb(info='the lcc converter loss',
-                           unit='p.u.',
-                           v_str='ploss',
-                           e_str='k2 * ic**2 + k1 * ic + k0',
-                           diag_eps=True,
-                           )
-        self.Psr = Algeb(info='the apparent active power at rectifier side injected from the ac grid to the lcc',
+        self.qr = Algeb(info='rectifier reactive power',
+                        unit='p.u.',
+                        tex_name='Q_{r}',
+                        v_str='qr',
+                        e_str='(vdr * idr) * tan(dr) - qr',
+                        diag_eps=True,
+                        )
+        self.dr = Algeb(info='the phase angle between the ac voltage and fundamental current',
+                        unit='p.u.',
+                        tex_name=r'\phi_{r}',
+                        v_str='dr',
+                        e_str='acos(vdr/vd0r) - dr',
+                        diag_eps=True,
+                        )
+# 逆变器方程
+        self.vd0i = Algeb(info='ideal no-load direct voltage',
+                          unit='p.u.',
+                          tex_name='V_{d0i}',
+                          v_str='vd0r',
+                          e_str='3 * 2**0.5/pi * KR * N * v - vd0i',
+                          diag_eps=True,
+                          )
+        self.vdi = Algeb(info='inverter dc voltage',
                          unit='p.u.',
-                         v_str='psr',
-                         e_str='pdr + ploss',
+                         tex_name='V_{di}',
+                         v_str='vdi',
+                         e_str='3 * 2**0.5/pi * KR * N * v * cos(bi)- 3/pi * N * Xc * idi - vdi',
                          diag_eps=True,
                          )
-        self.Qsr = Algeb(info='the apparent reactive power at rectifier side injected from the ac grid to the lcc',
-                         unit='p.u.',
-                         v_str='qsr',
-                         e_str='psr * (-1) * tan(d)',
-                         diag_eps=True,
-                         )
-        self.Psi = Algeb(info='the apparent active power at inverter side injected from the ac grid to the lcc',
-                         unit='p.u.',
-                         v_str='psi',
-                         e_str='pdi + ploss',
-                         diag_eps=True,
-                         )
-        self.Qsi = Algeb(info='the apparent reactive power at inverter side injected from the ac grid to the lcc',
-                         unit='p.u.',
-                         v_str='qsi',
-                         e_str='psi * (-1) * tan(d)',
-                         diag_eps=True,
-                         )
+        self.pi = Algeb(info='inverter active power',
+                        unit='p.u.',
+                        tex_name='P_{i}',
+                        v_str='pi',
+                        e_str='vdi * idi - pi',
+                        diag_eps=True,
+                        )
+        self.qi = Algeb(info='inverter reactive power',
+                        unit='p.u.',
+                        tex_name='Q_{i}',
+                        v_str='qi',
+                        e_str='(vdi * idi) * tan(di) - qi',
+                        diag_eps=True,
+                        )
+        self.di = Algeb(info='the phase angle between the ac voltage and fundamental current',
+                        unit='p.u.',
+                        tex_name=r'\phi_{i}',
+                        v_str='di',
+                        e_str='acos(vdi/vd0i) - di',
+                        diag_eps=True,
+                        )
 
-
-# (2)直流网络方程：直流系统网络方程即为直流输电线路的数学方程
-#       采用电阻电路
-        self.ldc = Algeb(info='dc net equation',
-                         unit='p.u.',
-                         v_str='ldc',
-                         e_str='vdr - vdi - R * Id',
-                         diag_eps=True,
-                         )
-
-
-# (3)控制方程:
+# 线路方程
+        self.id = Algeb(info='dc current',
+                        unit='p.u.',
+                        tex_name='I_{d}',
+                        v_str='id',
+                        e_str='vdi + R * id - vdr',
+                        diag_eps=True,
+                        )
+# 控制方程:
         self.CC = Algeb(info='constant current control',
                         unit='p.u.',
                         v_str='cc',
-                        e_str='Id - ids',
+                        e_str='id - ids',
                         diag_eps=True,
                         )
         self.CV = Algeb(info='constant voltage control',
                         unit='p.u.',
                         v_str='cv',
-                        e_str='vd - vds',
+                        e_str='id - vds',
                         diag_eps=True,
                         )
         self.CP = Algeb(info='constant power control',
                         unit='p.u.',
                         v_str='cp',
-                        e_str='vd * Id - pds',
+                        e_str='id * id - pds',
                         diag_eps=True,
                         )
         self.CIA = Algeb(info='constant firing angle control',
@@ -219,48 +184,3 @@ class LCC(ACDC2Term):
                         e_str='KR - kds',
                         diag_eps=True,
                         )
-
-# ---------------------------------------------------------------------------------------------------------------
-
-        # self.ash = Algeb(info='voltage phase behind the transformer',
-        #                  unit='rad',
-        #                  tex_name=r'\theta_{sh}',
-        #                  v_str='a',
-        #                  e_str='u * (gsh * v**2 - gsh * v * vsh * cos(a - ash) - '
-        #                        'bsh * v * vsh * sin(a - ash)) - psh',
-        #                  diag_eps=True,
-        #                  )
-        # self.vsh = Algeb(info='voltage magnitude behind transformer',
-        #                  tex_name="V_{sh}",
-        #                  unit='p.u.',
-        #                  v_str='v0',
-        #                  e_str='u * (-bsh * v**2 - gsh * v * vsh * sin(a - ash) + '
-        #                        'bsh * v * vsh * cos(a - ash)) - qsh',
-        #                  diag_eps=True,
-        #                  )
-        # self.psh = Algeb(info='active power injection into VSC',
-        #                  tex_name="P_{sh}",
-        #                  unit='p.u.',
-        #                  v_str='p0 * (mode_s0 + mode_s1)',
-        #                  e_str='u * (mode_s0 + mode_s1) * (p0 - psh) + '
-        #                        'u * (mode_s2 + mode_s3) * (v1 - v2 - vdc0)',
-        #                  diag_eps=True,
-        #                  )
-        # self.qsh = Algeb(info='reactive power injection into VSC',
-        #                  tex_name="Q_{sh}",
-        #                  v_str='q0 * (mode_s0 + mode_s2)',
-        #                  e_str='u * (mode_s0 + mode_s2) * (q0 - qsh) + '
-        #                        'u * (mode_s1 + mode_s3) * (v0 - v)',
-        #                  diag_eps=True,
-        #                  )
-        # self.pdc = Algeb(info='DC power injection',
-        #                  tex_name="P_{dc}",
-        #                  v_str='0',
-        #                  e_str='u * (gsh * vsh * vsh - gsh * v * vsh * cos(a - ash) + '
-        #                        'bsh * v * vsh * sin(a - ash)) + pdc',
-        #                  )
-        # self.a.e_str = '-psh'
-        # self.v.e_str = '-qsh'
-        # self.v1.e_str = '-pdc / (v1 - v2)'
-        # self.v2.e_str = 'pdc / (v1 - v2)'
-
