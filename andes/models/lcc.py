@@ -56,12 +56,16 @@ class LCC(ACDC2Term):
         self.ar = NumParam(default=15, info="firing delay angle", unit="rad")
         self.bi = NumParam(default=15, info="extinction advance angle", unit="rad")
 
+        self.idr = NumParam(default=1)
+        self.idi = NumParam(default=1)
+        self.R = NumParam(default=3.6)
+
         self.control = NumParam(info="Control method: 0-CC, 1-CV, 2-CP, 3-CIA, 4-CEA, or 5-CR", mandatory=True)
 
         # define variables and equations
         self.flags.update({'pflow': True})
         self.flags.update({'tds': True})
-        self.group = 'staticACDC'
+        self.group = 'StaticACDC'
 
         self.mode = Switcher(u=self.control, options=(0, 1, 2, 3, 4, 5))
 
@@ -150,37 +154,37 @@ class LCC(ACDC2Term):
 # 控制方程:
         self.CC = Algeb(info='constant current control',
                         unit='p.u.',
-                        v_str='cc',
+                        v_str='CC',
                         e_str='id - ids',
                         diag_eps=True,
                         )
         self.CV = Algeb(info='constant voltage control',
                         unit='p.u.',
-                        v_str='cv',
+                        v_str='CV',
                         e_str='id - vds',
                         diag_eps=True,
                         )
         self.CP = Algeb(info='constant power control',
                         unit='p.u.',
-                        v_str='cp',
+                        v_str='CP',
                         e_str='id * id - pds',
                         diag_eps=True,
                         )
         self.CIA = Algeb(info='constant firing angle control',
                          unit='raf',
-                         v_str='cia',
+                         v_str='CIA',
                          e_str='cos(ar) - cos(ads)',
                          diag_eps=True,
                          )
         self.CEA = Algeb(info='constant extinction angle control',
                          unit='rad',
-                         v_str='cea',
+                         v_str='CEA',
                          e_str='cos(bi) - cos(bds)',
                          diag_eps=True,
                          )
         self.CR = Algeb(info='constant ratios control',
                         unit='p.u.',
-                        v_str='cr',
+                        v_str='CR',
                         e_str='KR - kds',
                         diag_eps=True,
                         )
