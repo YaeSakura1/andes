@@ -6,6 +6,8 @@ from andes.core.var import Algeb, State, ExtState, ExtAlgeb  # NOQA
 from andes.core.service import ConstService, ExtService  # NOQA
 from andes.core.discrete import HardLimiter, Switcher, AntiWindup  # NOQA
 from andes.core.block import PIController  #NOQA
+import math
+pi=math.pi
 
 class LCC(ACDC2Term):
     """Data for LCC in power flow"""
