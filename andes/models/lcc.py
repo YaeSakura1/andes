@@ -6,8 +6,6 @@ from andes.core.var import Algeb, State, ExtState, ExtAlgeb  # NOQA
 from andes.core.service import ConstService, ExtService  # NOQA
 from andes.core.discrete import HardLimiter, Switcher, AntiWindup  # NOQA
 from andes.core.block import PIController  #NOQA
-import math
-pi=math.pi
 
 class LCC(ACDC2Term):
     """Data for LCC in power flow"""
@@ -77,14 +75,14 @@ class LCC(ACDC2Term):
                           unit='p.u.',
                           tex_name='V_{d0r}',
                           v_str='vd0r',
-                          e_str='3 * 2**0.5/pi * KR * N * v - vd0r',
+                          e_str='3 * 2**0.5/3.14 * KR * N * v',
                           diag_eps=True,
                           )
         self.vdr = Algeb(info='rectifier dc voltage',
                          unit='p.u.',
                          tex_name='V_{dr}',
                          v_str='vdr',
-                         e_str='3 * 2**0.5/pi * KR * N * v * cos(ar)- 3/pi * N * Xc * idr - vdr',
+                         e_str='3 * 2**0.5/3.14 * KR * N * v * cos(ar)- 3/3.14 * N * Xc * idr - vdr',
                          diag_eps=True,
                          )
         self.pr = Algeb(info='rectifier active power',
@@ -113,14 +111,14 @@ class LCC(ACDC2Term):
                           unit='p.u.',
                           tex_name='V_{d0i}',
                           v_str='vd0r',
-                          e_str='3 * 2**0.5/pi * KR * N * v - vd0i',
+                          e_str='3 * 2**0.5/3.14 * KR * N * v - vd0i',
                           diag_eps=True,
                           )
         self.vdi = Algeb(info='inverter dc voltage',
                          unit='p.u.',
                          tex_name='V_{di}',
                          v_str='vdi',
-                         e_str='3 * 2**0.5/pi * KR * N * v * cos(bi)- 3/pi * N * Xc * idi - vdi',
+                         e_str='3 * 2**0.5/3.14 * KR * N * v * cos(bi)- 3/3.14 * N * Xc * idi - vdi',
                          diag_eps=True,
                          )
         self.pi = Algeb(info='inverter active power',

@@ -1618,6 +1618,8 @@ class System:
 
         ``system.models['Bus']`` points the same instance as ``system.Bus``.
         """
+
+        print('********************************************')
         for file, cls_list in file_classes.items():
             for model_name in cls_list:
                 the_module = importlib.import_module('andes.models.' + file)
@@ -1628,6 +1630,8 @@ class System:
 
                 # link to the group
                 group_name = self.__dict__[model_name].group
+                # print(group_name)
+                print(model_name)
                 self.__dict__[group_name].add_model(model_name, self.__dict__[model_name])
 
     def import_routines(self):

@@ -40,8 +40,8 @@ class VSCSeries(ACDC2Term):
         self.flags.update({'tds': True})
         self.group = 'StaticACDC'
 
-        self.gse = ConstService(tex_name='g_{se}', v_str='re(1/(rse + 1j * xse))', vtype=complex)
-        self.bse = ConstService(tex_name='b_{se}', v_str='im(1/(rse + 1j * xse))', vtype=complex)
+        self.gse = ConstService(tex_name='g_{se}', v_str='re(1/(rse + 1j * xse))')
+        self.bse = ConstService(tex_name='b_{se}', v_str='im(1/(rse + 1j * xse))')
 
         self.mode = Switcher(u=self.control, options=(0, 1, 2, 3))
 
