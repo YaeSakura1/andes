@@ -622,9 +622,14 @@ class DCLink(GroupBase):
 
 class StaticACDC(GroupBase):
     """AC DC device for power flow"""
-    def __init__(self):
-        super().__init__()
+    # def __init__(self):
+    #     super().__init__()
         # self.common_vars.extend(('vsout',))
+    pass
+
+
+class StaticLCC(GroupBase):
+    """LCC device for power flow"""
     pass
 
 
