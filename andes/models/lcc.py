@@ -65,7 +65,7 @@ class LCC(ACDC2Term):
         # define variables and equations
         self.flags.update({'pflow': True})
         self.flags.update({'tds': True})
-        self.group = 'StaticACDC'
+        self.group = 'StaticLCC'
 
         self.mode = Switcher(u=self.control, options=(0, 1, 2, 3, 4, 5))
 
@@ -75,7 +75,7 @@ class LCC(ACDC2Term):
                           unit='p.u.',
                           tex_name='V_{d0r}',
                           v_str='vd0r',
-                          e_str='3 * 2**0.5/3.14 * KR * N * v',
+                          e_str='3 * 2**0.5/3.14 * KR * N * v - vd0r',
                           diag_eps=True,
                           )
         self.vdr = Algeb(info='rectifier dc voltage',
@@ -110,7 +110,7 @@ class LCC(ACDC2Term):
         self.vd0i = Algeb(info='ideal no-load direct voltage',
                           unit='p.u.',
                           tex_name='V_{d0i}',
-                          v_str='vd0r',
+                          v_str='vd0i',
                           e_str='3 * 2**0.5/3.14 * KR * N * v - vd0i',
                           diag_eps=True,
                           )
@@ -148,7 +148,7 @@ class LCC(ACDC2Term):
                         unit='p.u.',
                         tex_name='I_{d}',
                         v_str='id',
-                        e_str='vdi + R * id - vdr',
+                        e_str='vdr - vdi - R * id',
                         diag_eps=True,
                         )
 # 控制方程:
