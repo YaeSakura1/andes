@@ -31,7 +31,7 @@ file_classes = OrderedDict([
     ('coi', ['COI', ]),
     ('dcbase', ['Node', 'Ground', 'R', 'L', 'C', 'RCp', 'RCs', 'RLs', 'RLCs', 'RLCp']),
     ('vsc', ['VSCShunt']),
-    # ('lcc', ['LCC']),
+    ('lcc', ['LCC']),
     # ('mmc', ['MMCShunt']),
     ('renewable', ['REGCA1', 'REECA1', 'REPCA1', 'WTDTA1', 'WTDS', 'WTARA1', 'WTPTA1', 'WTTQA1', 'WTARV1']),
     ('distributed', ['PVD1', 'ESD1']),
